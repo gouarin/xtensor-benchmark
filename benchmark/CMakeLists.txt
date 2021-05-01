@@ -1,4 +1,5 @@
 set(XTENSOR_BENCHMARKS
+    axpy.cpp
     laplacian_1D.cpp
     laplacian_2D.cpp
     laplacian_3D.cpp
