@@ -9,3 +9,4 @@ set(XTENSOR_BENCHMARKS
 add_executable(bench_xtensor ${XTENSOR_BENCHMARKS})
 target_link_libraries(bench_xtensor benchmark::benchmark xtensor xtensor::optimize xtensor::use_xsimd)
 # target_link_libraries(bench_xtensor benchmark::benchmark xtensor xtensor::optimize)
+add_subdirectory(xsimd)
