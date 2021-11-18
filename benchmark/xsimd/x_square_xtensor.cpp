@@ -78,6 +78,7 @@ private:
 #include <xtensor/xtensor.hpp>
 #include <xtensor/xadapt.hpp>
 #include <xtensor/xnoalias.hpp>
+#include <xtensor/xview.hpp>
 
 #include "CLI/CLI.hpp"
 
@@ -153,6 +154,24 @@ void run_lazy(std::size_t size, std::size_t max_it, const CT& src, CT& dst)
         // }
         // xt::noalias(dst) = src*src;
         xt::noalias(dst) = expr;
+    }
+    std::cout << toc() << std::endl;
+}
+
+template<class CT>
+void run_lazy_view(std::size_t size, std::size_t max_it, const CT& src, CT& dst)
+{
+    auto expr = xt::view(src, xt::all())*xt::view(src, xt::all());
+    tic();
+    for (size_t max_iteration = max_it; max_iteration > 0; --max_iteration)
+    {
+        // if (src.shape().size() != dst.shape().size() || !std::equal(std::begin(src.shape()), std::end(src.shape()), std::begin(dst.shape())))
+        // {
+        //     dst.resize(src.shape());
+        // }
+        // xt::noalias(dst) = src*src;
+        xt::noalias(dst) = expr;
+        // xt::noalias(xt::view(dst, xt::all())) = expr;
     }
     std::cout << toc() << std::endl;
 }
@@ -246,6 +265,13 @@ int main(int argc, char **argv)
         xt::xtensor<double, 1> dst({size}, 0);
         std::cout << src.data() << " " << dst.data() << std::endl;
         run_lazy(size, max_it, src, dst);
+    }
+    else if (ct == "xtensor_lazy_view")
+    {
+        xt::xtensor<double, 1> src({size}, 0);
+        xt::xtensor<double, 1> dst({size}, 0);
+        std::cout << src.data() << " " << dst.data() << std::endl;
+        run_lazy_view(size, max_it, src, dst);
     }
     else if (ct == "xtensor_simd")
     {
