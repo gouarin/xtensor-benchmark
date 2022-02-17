@@ -7,5 +7,8 @@ set(XTENSOR_BENCHMARKS
     main.cpp
 )
 add_executable(bench_xtensor ${XTENSOR_BENCHMARKS})
+
+# message(${gperftools_LIBRARY_DIRS})
+
 target_link_libraries(bench_xtensor benchmark::benchmark xtensor xtensor::optimize xtensor::use_xsimd)
 # target_link_libraries(bench_xtensor benchmark::benchmark xtensor xtensor::optimize)

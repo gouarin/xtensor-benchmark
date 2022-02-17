@@ -13,4 +13,9 @@ include(addGoogleBench)
 
 find_package(Threads)
 
+include(FindPkgConfig)
+pkg_check_modules(gpertools libprofiler)
+
+add_compile_options(-g)
+add_link_options(-g)
 add_subdirectory(benchmark)
