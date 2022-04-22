@@ -21,8 +21,7 @@ static void BM_std_vector_without_xsimd(benchmark::State& state)
     {
         for(std::size_t i=1; i< size-1; ++i)
         {
-            // u2[i] = u1[i-1] - 2.*u1[i] + u1[i+1];
-            u2[i] = u1[i-1] + u1[i+1];
+            u2[i] = u1[i-1] - 2.*u1[i] + u1[i+1];
         }
     }
 }
@@ -42,7 +41,7 @@ static void BM_std_vector(benchmark::State& state)
         for(std::size_t i=1; i< size-1; i+=simd_size)
         {
             auto res = xsimd::load_unaligned(address + i - 1 )
-                    //  - 2.*xsimd::load_unaligned(address + i)
+                     - 2.*xsimd::load_unaligned(address + i)
                      + xsimd::load_unaligned(address + i + 1);
             xsimd::store_unaligned(store_address + i, res);
         }
@@ -59,7 +58,7 @@ static void BM_eigen(benchmark::State& state)
     u2(Eigen::seq(0, size+2)) = 0.0;
     for (auto _ : state)
     {
-        u2(Eigen::seq(1, size+1)) = u1(Eigen::seq(0, size)) + u1(Eigen::seq(2, size+2));
+        u2(Eigen::seq(1, size+1)) = u1(Eigen::seq(0, size)) - 2.*u1(Eigen::seq(1, size+1)) + u1(Eigen::seq(2, size+2));
     }
 }
 
@@ -78,7 +77,7 @@ static void BM_svector(benchmark::State& state)
         for(std::size_t i=1; i< size-1; i+=simd_size)
         {
             auto res = xsimd::load_unaligned(address + i - 1 )
-                    //  - 2.*xsimd::load_unaligned(address + i)
+                     - 2.*xsimd::load_unaligned(address + i)
                      + xsimd::load_unaligned(address + i + 1);
             xsimd::store_unaligned(store_address + i, res);
         }
@@ -100,7 +99,7 @@ static void BM_uvector(benchmark::State& state)
         for(std::size_t i=1; i< size-1; i+=simd_size)
         {
             auto res = xsimd::load_unaligned(address + i - 1 )
-                    //  - 2.*xsimd::load_unaligned(address + i)
+                     - 2.*xsimd::load_unaligned(address + i)
                      + xsimd::load_unaligned(address + i + 1);
             xsimd::store_unaligned(store_address + i, res);
         }
@@ -149,7 +148,7 @@ static void BM_xtensor_2(benchmark::State& state)
         for(std::size_t i=1; i< size-1; i+=4)
         {
             auto res = xsimd::load_unaligned(address + i - 1 )
-                     - 2.*xsimd::load_unaligned(address + i)
+                    //  - 2.*xsimd::load_unaligned(address + i)
                      + xsimd::load_unaligned(address + i + 1);
             xsimd::store_unaligned(store_address + i, res);
         }
@@ -282,8 +281,7 @@ static void BM_xtensor_5(benchmark::State& state)
 
     for (auto _ : state)
     {
-        // xt::noalias(v2) = v1m1 - 2*v10 + v1p1;
-        xt::noalias(v2) = v1m1 + v1p1;
+        xt::noalias(v2) = v1m1 - 2*v10 + v1p1;
     }
 }
 
@@ -506,17 +504,17 @@ static void BM_xtensor_8(benchmark::State& state)
 std::size_t min = 1<<14;
 std::size_t max = 1<<16;
 
-// BENCHMARK(BM_std_vector_without_xsimd)->RangeMultiplier(2)->Ranges({{min, max}});
+BENCHMARK(BM_std_vector_without_xsimd)->RangeMultiplier(2)->Ranges({{min, max}});
 // BENCHMARK(BM_std_vector)->RangeMultiplier(2)->Ranges({{min, max}});
-// BENCHMARK(BM_eigen)->RangeMultiplier(2)->Ranges({{min, max}});
+BENCHMARK(BM_eigen)->RangeMultiplier(2)->Ranges({{min, max}});
 // BENCHMARK(BM_svector)->RangeMultiplier(2)->Ranges({{min, max}});
 // BENCHMARK(BM_uvector)->RangeMultiplier(2)->Ranges({{min, max}});
 // BENCHMARK(BM_xtensor)->RangeMultiplier(2)->Ranges({{min, max}});
 // BENCHMARK(BM_xtensor_2)->RangeMultiplier(2)->Ranges({{min, max}});
-BENCHMARK(BM_xtensor_3)->RangeMultiplier(2)->Ranges({{min, max}});
-BENCHMARK(BM_xtensor_3_1)->RangeMultiplier(2)->Ranges({{min, max}});
+// BENCHMARK(BM_xtensor_3)->RangeMultiplier(2)->Ranges({{min, max}});
+// BENCHMARK(BM_xtensor_3_1)->RangeMultiplier(2)->Ranges({{min, max}});
 // BENCHMARK(BM_xtensor_4)->RangeMultiplier(2)->Ranges({{min, max}});
-// BENCHMARK(BM_xtensor_5)->RangeMultiplier(2)->Ranges({{min, max}});
+BENCHMARK(BM_xtensor_5)->RangeMultiplier(2)->Ranges({{min, max}});
 // BENCHMARK(BM_xtensor_6)->RangeMultiplier(2)->Ranges({{min, max}});
 // BENCHMARK(BM_xtensor_6_1)->RangeMultiplier(2)->Ranges({{min, max}});
 // BENCHMARK(BM_xtensor_6_2)->RangeMultiplier(2)->Ranges({{min, max}});

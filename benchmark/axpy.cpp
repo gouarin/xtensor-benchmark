@@ -5,6 +5,9 @@
 #include <xtensor/xview.hpp>
 #include <xtensor/xnoalias.hpp>
 
+#include <Eigen/Core>
+#include <Eigen/Dense>
+
 static void BM_std_vector_axpy(benchmark::State& state)
 {
     std::size_t size = state.range(0);
@@ -16,6 +19,18 @@ static void BM_std_vector_axpy(benchmark::State& state)
         {
             u2[i] = 5*u1[i] + 1;
         }
+    }
+    state.SetComplexityN(state.range(0));
+}
+
+static void BM_eigen_axpy(benchmark::State& state)
+{
+    std::size_t size = state.range(0);
+    Eigen::ArrayXd u1(size), u2(size);
+
+    for (auto _ : state)
+    {
+        u2 = 5*u1 + 1;
     }
     state.SetComplexityN(state.range(0));
 }
@@ -72,9 +87,10 @@ static void BM_xview3_axpy(benchmark::State& state)
     state.SetComplexityN(state.range(0));
 }
 
-BENCHMARK(BM_std_vector_axpy)->RangeMultiplier(2)->Ranges({{1<<14, 1<<20}})->Complexity(benchmark::oN);
+// BENCHMARK(BM_std_vector_axpy)->RangeMultiplier(2)->Ranges({{1<<14, 1<<20}})->Complexity(benchmark::oN);
+BENCHMARK(BM_eigen_axpy)->RangeMultiplier(2)->Ranges({{1<<14, 1<<20}})->Complexity(benchmark::oN);
 BENCHMARK(BM_xtensor_axpy)->RangeMultiplier(2)->Ranges({{1<<14, 1<<20}})->Complexity(benchmark::oN);
 BENCHMARK(BM_xview1_axpy)->RangeMultiplier(2)->Ranges({{1<<14, 1<<20}})->Complexity(benchmark::oN);
-BENCHMARK(BM_xview2_axpy)->RangeMultiplier(2)->Ranges({{1<<14, 1<<20}})->Complexity(benchmark::oN);
-BENCHMARK(BM_xview3_axpy)->RangeMultiplier(2)->Ranges({{1<<14, 1<<20}})->Complexity(benchmark::oN);
+// BENCHMARK(BM_xview2_axpy)->RangeMultiplier(2)->Ranges({{1<<14, 1<<20}})->Complexity(benchmark::oN);
+// BENCHMARK(BM_xview3_axpy)->RangeMultiplier(2)->Ranges({{1<<14, 1<<20}})->Complexity(benchmark::oN);
 

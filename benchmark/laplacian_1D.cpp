@@ -5,6 +5,9 @@
 #include <xtensor/xview.hpp>
 #include <xtensor/xnoalias.hpp>
 
+#include <Eigen/Core>
+#include <Eigen/Dense>
+
 static void BM_std_vector_lap_1D(benchmark::State& state)
 {
     std::size_t size = state.range(0);
@@ -16,6 +19,21 @@ static void BM_std_vector_lap_1D(benchmark::State& state)
         {
             u2[i] = u1[i-1] - 2*u1[i] + u1[i+1];
         }
+    }
+    state.SetComplexityN(state.range(0));
+}
+
+static void BM_eigen_lap_1D(benchmark::State& state)
+{
+    std::size_t size = state.range(0);
+
+    Eigen::ArrayXd u1(size);                                                                         \
+    Eigen::ArrayXd u2(size);                                                                         \
+    u1(Eigen::seq(0, size+2)) = 0.0;
+    u2(Eigen::seq(0, size+2)) = 0.0;
+    for (auto _ : state)
+    {
+        u2(Eigen::seq(1, size-1)) = u1(Eigen::seq(0, size-2)) - 2.*u1(Eigen::seq(1, size-1)) + u1(Eigen::seq(2, size));
     }
     state.SetComplexityN(state.range(0));
 }
@@ -79,6 +97,7 @@ static void BM_xtensor_with_loop_lap_1D(benchmark::State& state)
 }
 
 BENCHMARK(BM_std_vector_lap_1D)->RangeMultiplier(2)->Ranges({{1<<14, 1<<20}})->Complexity(benchmark::oN);
+BENCHMARK(BM_eigen_lap_1D)->RangeMultiplier(2)->Ranges({{1<<14, 1<<20}})->Complexity(benchmark::oN);
 BENCHMARK(BM_xtensor_with_step_lap_1D)->RangeMultiplier(2)->Ranges({{1<<14, 1<<20}})->Complexity(benchmark::oN);
 BENCHMARK(BM_xtensor_without_step_lap_1D)->RangeMultiplier(2)->Ranges({{1<<14, 1<<20}})->Complexity(benchmark::oN);
 BENCHMARK(BM_xtensor_with_loop_lap_1D)->RangeMultiplier(2)->Ranges({{1<<14, 1<<20}})->Complexity(benchmark::oN);
